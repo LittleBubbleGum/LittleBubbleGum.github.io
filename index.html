@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>国家、国籍与语言 - 交互式发音学习表</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f0f7ff;
+      margin: 0;
+      padding: 20px;
+      color: #1a2c3e;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+      overflow-x: auto;
+      padding: 1rem 0.5rem 1.5rem 0.5rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.9rem;
+      margin: 0.5rem 0 0.25rem;
+      color: #0b3b5f;
+      letter-spacing: -0.3px;
+      padding: 0 1rem;
+    }
+
+    .sub {
+      text-align: center;
+      color: #4a6a85;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e2edf7;
+      display: inline-block;
+      width: auto;
+      margin-left: auto;
+      margin-right: auto;
+      padding-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .description {
+      text-align: center;
+      font-size: 0.9rem;
+      background: #eef3fc;
+      display: inline-block;
+      width: auto;
+      margin: 0 auto 1.2rem;
+      padding: 6px 18px;
+      border-radius: 40px;
+      color: #0056a7;
+    }
+
+    /* 表格样式 */
+    .word-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 680px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .word-table th {
+      background: #1e4663;
+      color: white;
+      padding: 14px 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(2px);
+    }
+
+    .word-table td {
+      border-bottom: 1px solid #dce5ec;
+      padding: 12px 8px;
+      vertical-align: middle;
+      background-color: #ffffff;
+      transition: background 0.1s ease;
+    }
+
+    .word-table tr:hover td {
+      background-color: #f6fafe;
+    }
+
+    /* 发音按钮样式 */
+    .pronounce-btn {
+      background: #eef2f8;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 6px 10px;
+      margin-left: 8px;
+      border-radius: 40px;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #1e4663;
+      font-weight: 500;
+    }
+
+    .pronounce-btn:hover {
+      background: #d9e4f0;
+      transform: scale(1.02);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .pronounce-btn:active {
+      transform: scale(0.97);
+    }
+
+    .word-cell {
+      font-weight: 500;
+      color: #0f2c3f;
+      word-break: break-word;
+    }
+
+    .language-cell {
+      color: #1f5e3a;
+      font-weight: 500;
+    }
+
+    .nationality-adj,
+    .nationality-noun {
+      color: #2c5282;
+    }
+
+    /* 扬声器小图标 */
+    .speaker-icon {
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    /* 手机适配 */
+    @media (max-width: 760px) {
+      body {
+        padding: 12px;
+      }
+
+      .word-table th,
+      .word-table td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+      }
+
+      .pronounce-btn {
+        padding: 4px 8px;
+        font-size: 1rem;
+      }
+
+      .speaker-icon {
+        font-size: 0.85rem;
+      }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 0.75rem;
+      color: #6c8dae;
+    }
+
+    .note {
+      background: #fef7e0;
+      border-left: 5px solid #ffb347;
+      padding: 8px 15px;
+      margin: 0 1rem 1.2rem 1rem;
+      border-radius: 14px;
+      font-size: 0.8rem;
+      color: #8a6e2d;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>🌍 国家 · 国籍 · 语言</h1>
+    <div style="text-align: center;">
+      <div class="description">🔊 点击任意单词右侧的 <span style="background:#eef2f8; padding:2px 8px; border-radius:30px;">🔊
+          发音按钮</span> 即可听到标准读音 (Web Speech API)</div>
+    </div>
+    <div class="note">
+      💡 提示：发音基于浏览器内置语音合成（Web Speech），支持多语言自动匹配。点击按钮即可朗读对应的英文单词。部分特殊国籍名词采用常见表述。
+    </div>
+    <div style="overflow-x: auto; margin: 0 0.5rem;">
+      <table class="word-table" id="countriesTable">
+        <thead>
+          <tr>
+            <th>🌏 国家 / 地区</th>
+            <th>🧑 国籍 (形容词)</th>
+            <th>🧑‍🤝‍🧑 国籍 (名词 / 国民)</th>
+            <th>🗣️ 主要语言</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- 动态JS填充，保证数据完整并附加发音按钮 -->
+        </tbody>
+      </table>
+    </div>
+    <footer>数据源自讲座整理 · 点击发音按钮使用系统TTS引擎 · 支持大多数现代浏览器</footer>
+  </div>
+
+  <script>
+    // --------------------------------------------------------------
+    // 原始数据集（基于文档内容补充完善，保持完整度）
+    // 包含 国家, 国籍形容词, 国籍名词(代表性), 语言
+    // 针对缺失或特殊处理做了优化，确保发音自然
+    // --------------------------------------------------------------
+    const countriesData = [
+      { country: "Afghanistan", nationalityAdj: "Afghani", nationalityNoun: "an Afghani", language: "Dari (Persian) / Pashto" },
+      { country: "Albania", nationalityAdj: "Albanian", nationalityNoun: "an Albanian", language: "Albanian" },
+      { country: "Algeria", nationalityAdj: "Algerian", nationalityNoun: "an Algerian", language: "Arabic" },
+      { country: "Argentina", nationalityAdj: "Argentine / Argentinian", nationalityNoun: "an Argentine / an Argentinian", language: "Spanish" },
+      { country: "Australia", nationalityAdj: "Australian", nationalityNoun: "an Australian", language: "English" },
+      { country: "Austria", nationalityAdj: "Austrian", nationalityNoun: "an Austrian", language: "German" },
+      { country: "Bangladesh", nationalityAdj: "Bangladeshi", nationalityNoun: "a Bangladeshi", language: "Bengali" },
+      { country: "Belgium", nationalityAdj: "Belgian", nationalityNoun: "a Belgian", language: "French / Flemish" },
+      { country: "Bolivia", nationalityAdj: "Bolivian", nationalityNoun: "a Bolivian", language: "Spanish" },
+      { country: "Botswana", nationalityAdj: "Batswana", nationalityNoun: "a Botswanan", language: "English, Setswana" },
+      { country: "Brazil", nationalityAdj: "Brazilian", nationalityNoun: "a Brazilian", language: "Portuguese" },
+      { country: "Bulgaria", nationalityAdj: "Bulgarian", nationalityNoun: "a Bulgarian", language: "Bulgarian" },
+      { country: "Cambodia", nationalityAdj: "Cambodian", nationalityNoun: "a Cambodian", language: "Cambodian" },
+      { country: "Cameroon", nationalityAdj: "Cameroonian", nationalityNoun: "a Cameroonian", language: "French / English" },
+      { country: "Canada", nationalityAdj: "Canadian", nationalityNoun: "a Canadian", language: "English / French" },
+      { country: "Chile", nationalityAdj: "Chilean", nationalityNoun: "a Chilean", language: "Spanish" },
+      { country: "China", nationalityAdj: "Chinese", nationalityNoun: "a Chinese person", language: "Chinese" },
+      { country: "Colombia", nationalityAdj: "Colombian", nationalityNoun: "a Colombian", language: "Spanish" },
+      { country: "Costa Rica", nationalityAdj: "Costa Rican", nationalityNoun: "a Costa Rican", language: "Spanish" },
+      { country: "Croatia", nationalityAdj: "Croatian", nationalityNoun: "a Croat", language: "Croatian" },
+      { country: "Cuba", nationalityAdj: "Cuban", nationalityNoun: "a Cuban", language: "Spanish" },
+      { country: "Czech Republic", nationalityAdj: "Czech", nationalityNoun: "a Czech person", language: "Czech" },
+      { country: "Denmark", nationalityAdj: "Danish", nationalityNoun: "a Dane", language: "Danish" },
+      { country: "Dominican Republic", nationalityAdj: "Dominican", nationalityNoun: "a Dominican", language: "Spanish" },
+      { country: "Ecuador", nationalityAdj: "Ecuadorian", nationalityNoun: "an Ecuadorian", language: "Spanish" },
+      { country: "Egypt", nationalityAdj: "Egyptian", nationalityNoun: "an Egyptian", language: "Arabic" },
+      { country: "El Salvador", nationalityAdj: "Salvadorian", nationalityNoun: "a Salvadoran", language: "Spanish" },
+      { country: "England", nationalityAdj: "English", nationalityNoun: "an Englishman / an Englishwoman", language: "English" },
+      { country: "Estonia", nationalityAdj: "Estonian", nationalityNoun: "an Estonian", language: "Estonian" },
+      { country: "Ethiopia", nationalityAdj: "Ethiopian", nationalityNoun: "an Ethiopian", language: "Amharic" },
+      { country: "Fiji", nationalityAdj: "Fijian", nationalityNoun: "a Fijian", language: "English, Fijian" },
+      { country: "Finland", nationalityAdj: "Finnish", nationalityNoun: "a Finn", language: "Finnish" },
+      { country: "France", nationalityAdj: "French", nationalityNoun: "a Frenchman / a Frenchwoman", language: "French" },
+      { country: "Germany", nationalityAdj: "German", nationalityNoun: "a German", language: "German" },
+      { country: "Ghana", nationalityAdj: "Ghanaian", nationalityNoun: "a Ghanaian", language: "English" },
+      { country: "Greece", nationalityAdj: "Greek", nationalityNoun: "a Greek", language: "Greek" },
+      { country: "Guatemala", nationalityAdj: "Guatemalan", nationalityNoun: "a Guatemalan", language: "Spanish" },
+      { country: "Haiti", nationalityAdj: "Haitian", nationalityNoun: "a Haitian", language: "French / Creole" },
+      { country: "Honduras", nationalityAdj: "Honduran", nationalityNoun: "a Honduran", language: "Spanish" },
+      { country: "Hungary", nationalityAdj: "Hungarian", nationalityNoun: "a Hungarian", language: "Hungarian" },
+      { country: "Iceland", nationalityAdj: "Icelandic", nationalityNoun: "an Icelander", language: "Icelandic" },
+      { country: "India", nationalityAdj: "Indian", nationalityNoun: "an Indian", language: "Hindi / English" },
+      { country: "Indonesia", nationalityAdj: "Indonesian", nationalityNoun: "an Indonesian", language: "Indonesian" },
+      { country: "Iran", nationalityAdj: "Iranian", nationalityNoun: "an Iranian", language: "Persian" },
+      { country: "Iraq", nationalityAdj: "Iraqi", nationalityNoun: "an Iraqi", language: "Arabic, Kurdish" },
+      { country: "Ireland", nationalityAdj: "Irish", nationalityNoun: "an Irishman / an Irishwoman", language: "Irish / English" },
+      { country: "Israel", nationalityAdj: "Israeli", nationalityNoun: "an Israeli", language: "Hebrew" },
+      { country: "Italy", nationalityAdj: "Italian", nationalityNoun: "an Italian", language: "Italian" },
+      { country: "Jamaica", nationalityAdj: "Jamaican", nationalityNoun: "a Jamaican", language: "English" },
+      { country: "Japan", nationalityAdj: "Japanese", nationalityNoun: "a Japanese person", language: "Japanese" },
+      { country: "Jordan", nationalityAdj: "Jordanian", nationalityNoun: "a Jordanian", language: "Arabic" },
+      { country: "Kenya", nationalityAdj: "Kenyan", nationalityNoun: "a Kenyan", language: "Swahili" },
+      { country: "Kuwait", nationalityAdj: "Kuwaiti", nationalityNoun: "a Kuwaiti", language: "Arabic" },
+      { country: "Laos", nationalityAdj: "Lao", nationalityNoun: "a Laotian", language: "Laotian" },
+      { country: "Latvia", nationalityAdj: "Latvian", nationalityNoun: "a Latvian", language: "Latvian" },
+      { country: "Lebanon", nationalityAdj: "Lebanese", nationalityNoun: "a Lebanese", language: "Arabic" },
+      { country: "Libya", nationalityAdj: "Libyan", nationalityNoun: "a Libyan", language: "Arabic" },
+      { country: "Lithuania", nationalityAdj: "Lithuanian", nationalityNoun: "a Lithuanian", language: "Lithuanian" },
+      { country: "Madagascar", nationalityAdj: "Malagasy", nationalityNoun: "a Malagasy", language: "Malagasy / French" },
+      { country: "Malaysia", nationalityAdj: "Malaysian", nationalityNoun: "a Malaysian", language: "Malay / Malaysian" },
+      { country: "Mali", nationalityAdj: "Malian", nationalityNoun: "a Malian", language: "French" },
+      { country: "Malta", nationalityAdj: "Maltese", nationalityNoun: "a Maltese", language: "English, Maltese" },
+      { country: "Mexico", nationalityAdj: "Mexican", nationalityNoun: "a Mexican", language: "Spanish" },
+      { country: "Mongolia", nationalityAdj: "Mongolian", nationalityNoun: "a Mongolian", language: "Mongolian" },
+      { country: "Morocco", nationalityAdj: "Moroccan", nationalityNoun: "a Moroccan", language: "Arabic / French" },
+      { country: "Mozambique", nationalityAdj: "Mozambican", nationalityNoun: "a Mozambican", language: "Portuguese" },
+      { country: "Namibia", nationalityAdj: "Namibian", nationalityNoun: "a Namibian", language: "English" },
+      { country: "Nepal", nationalityAdj: "Nepalese", nationalityNoun: "a Nepalese", language: "Nepali, English" },
+      { country: "Netherlands", nationalityAdj: "Dutch", nationalityNoun: "a Dutchman / a Dutchwoman", language: "Dutch" },
+      { country: "New Zealand", nationalityAdj: "New Zealand", nationalityNoun: "a New Zealander", language: "English / Maori" },
+      { country: "Nicaragua", nationalityAdj: "Nicaraguan", nationalityNoun: "a Nicaraguan", language: "Spanish" },
+      { country: "Nigeria", nationalityAdj: "Nigerian", nationalityNoun: "a Nigerian", language: "English" },
+      { country: "Norway", nationalityAdj: "Norwegian", nationalityNoun: "a Norwegian", language: "Norwegian" },
+      { country: "Pakistan", nationalityAdj: "Pakistani", nationalityNoun: "a Pakistani", language: "Urdu, English" },
+      { country: "Panama", nationalityAdj: "Panamanian", nationalityNoun: "a Panamanian", language: "Spanish" },
+      { country: "Paraguay", nationalityAdj: "Paraguayan", nationalityNoun: "a Paraguayan", language: "Spanish" },
+      { country: "Peru", nationalityAdj: "Peruvian", nationalityNoun: "a Peruvian", language: "Spanish" },
+      { country: "Philippines", nationalityAdj: "Philippine", nationalityNoun: "a Filipino", language: "Tagalog / Filipino" },
+      { country: "Poland", nationalityAdj: "Polish", nationalityNoun: "a Pole", language: "Polish" },
+      { country: "Portugal", nationalityAdj: "Portuguese", nationalityNoun: "a Portuguese person", language: "Portuguese" },
+      { country: "Romania", nationalityAdj: "Romanian", nationalityNoun: "a Romanian", language: "Romanian" },
+      { country: "Russia", nationalityAdj: "Russian", nationalityNoun: "a Russian", language: "Russian" },
+      { country: "Saudi Arabia", nationalityAdj: "Saudi", nationalityNoun: "a Saudi (Arabian)", language: "Arabic" },
+      { country: "Scotland", nationalityAdj: "Scottish", nationalityNoun: "a Scot", language: "English" },
+      { country: "Senegal", nationalityAdj: "Senegalese", nationalityNoun: "a Senegalese person", language: "French" },
+      { country: "Serbia", nationalityAdj: "Serbian", nationalityNoun: "a Serbian", language: "Serbian" },
+      { country: "Singapore", nationalityAdj: "Singaporean", nationalityNoun: "a Singaporean", language: "English, Malay, Mandarin, Tamil" },
+      { country: "Slovakia", nationalityAdj: "Slovak", nationalityNoun: "a Slovak", language: "Slovak" },
+      { country: "South Africa", nationalityAdj: "South African", nationalityNoun: "a South African", language: "Afrikaans, English, +9 more" },
+      { country: "South Korea", nationalityAdj: "Korean", nationalityNoun: "a Korean", language: "Korean" },
+      { country: "Spain", nationalityAdj: "Spanish", nationalityNoun: "a Spaniard", language: "Spanish" },
+      { country: "Sri Lanka", nationalityAdj: "Sri Lankan", nationalityNoun: "a Sri Lankan", language: "Sinhala, Tamil" },
+      { country: "Sudan", nationalityAdj: "Sudanese", nationalityNoun: "a Sudanese person", language: "Arabic, English" },
+      { country: "Sweden", nationalityAdj: "Swedish", nationalityNoun: "a Swede", language: "Swedish" },
+      { country: "Switzerland", nationalityAdj: "Swiss", nationalityNoun: "a Swiss person", language: "German, French, Italian, Romansh" },
+      { country: "Syria", nationalityAdj: "Syrian", nationalityNoun: "a Syrian", language: "Arabic" },
+      { country: "Tajikistan", nationalityAdj: "Tajikistani", nationalityNoun: "a Tajikistani", language: "Tajik (Persian)" },
+      { country: "Thailand", nationalityAdj: "Thai", nationalityNoun: "a Thai person", language: "Thai" },
+      { country: "Tonga", nationalityAdj: "Tongan", nationalityNoun: "a Tongan", language: "English, Tongan" },
+      { country: "Tunisia", nationalityAdj: "Tunisian", nationalityNoun: "a Tunisian", language: "Arabic" },
+      { country: "Turkey", nationalityAdj: "Turkish", nationalityNoun: "a Turk", language: "Turkish" },
+      { country: "Ukraine", nationalityAdj: "Ukrainian", nationalityNoun: "a Ukrainian", language: "Ukrainian" },
+      { country: "United Arab Emirates", nationalityAdj: "Emirati", nationalityNoun: "an Emirati", language: "Arabic" },
+      { country: "United Kingdom", nationalityAdj: "British", nationalityNoun: "a Brit", language: "English" },
+      { country: "United States", nationalityAdj: "American", nationalityNoun: "an American", language: "English" },
+      { country: "Uruguay", nationalityAdj: "Uruguayan", nationalityNoun: "a Uruguayan", language: "Spanish" },
+      { country: "Venezuela", nationalityAdj: "Venezuelan", nationalityNoun: "a Venezuelan", language: "Spanish" },
+      { country: "Vietnam", nationalityAdj: "Vietnamese", nationalityNoun: "a Vietnamese person", language: "Vietnamese" },
+      { country: "Wales", nationalityAdj: "Welsh", nationalityNoun: "a Welshman / a Welshwoman", language: "Welsh / English" },
+      { country: "Zambia", nationalityAdj: "Zambian", nationalityNoun: "a Zambian", language: "English" },
+      { country: "Zimbabwe", nationalityAdj: "Zimbabwean", nationalityNoun: "a Zimbabwean", language: "16 languages" }
+    ];
+
+    // 辅助函数：创建带发音按钮的单元格内容 (文本 + 按钮)
+    function createSpeakableCell(text, displayText = null) {
+      if (!text || text.trim() === "") text = "—";
+      const display = displayText !== null ? displayText : text;
+      // 清理可能的多重斜杠影响显示，但是保留原始文本用于朗读
+      const rawTextForSpeech = text;
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'space-between';
+      container.style.flexWrap = 'wrap';
+      container.style.gap = '6px';
+
+      const textSpan = document.createElement('span');
+      textSpan.className = 'word-cell';
+      textSpan.innerText = display;
+      textSpan.style.flex = '1';
+
+      const btn = document.createElement('button');
+      btn.className = 'pronounce-btn';
+      btn.setAttribute('aria-label', `朗读: ${rawTextForSpeech}`);
+      btn.innerHTML = `<span class="speaker-icon">🔊</span> <span style="font-size:0.7rem;">发音</span>`;
+
+      // 语音朗读逻辑
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakText(rawTextForSpeech);
+      });
+
+      container.appendChild(textSpan);
+      container.appendChild(btn);
+      return container;
+    }
+
+    // 对于语言字段特殊处理，确保长文本也支持朗读
+    function createLanguageCell(languageStr) {
+      if (!languageStr) languageStr = "—";
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'space-between';
+      container.style.flexWrap = 'wrap';
+      container.style.gap = '6px';
+
+      const langSpan = document.createElement('span');
+      langSpan.className = 'language-cell';
+      langSpan.innerText = languageStr;
+      langSpan.style.flex = '1';
+
+      const btn = document.createElement('button');
+      btn.className = 'pronounce-btn';
+      btn.innerHTML = `<span class="speaker-icon">🔊</span> <span style="font-size:0.7rem;">发音</span>`;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakText(languageStr);
+      });
+      container.appendChild(langSpan);
+      container.appendChild(btn);
+      return container;
+    }
+
+    // 核心朗读函数 (使用 Web Speech API)
+    let currentUtterance = null;
+    function speakText(text) {
+      // 取消任何正在播放的语音，避免重叠
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
+      // 过滤掉空或者太奇怪的内容
+      let cleanText = text.trim();
+      if (cleanText === "") return;
+      // 处理一些特殊符号，让发音更友好：将 '/' 替换为 ' or ' 但保留原意，增强可读性
+      // 但直接朗读也还好，为了自然替换斜杠发音
+      let utteranceText = cleanText.replace(/\//g, ' or ');
+      utteranceText = utteranceText.replace(/ - /g, ', ');
+
+      const utterance = new SpeechSynthesisUtterance(utteranceText);
+      // 尝试选择英文语音，确保大多数单词发音准确 (国籍、国家均为英文名)
+      utterance.lang = 'en-US';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+
+      // 选取更好的语音 (优先 Google 或 Microsoft 英文)
+      if (window.speechSynthesis.getVoices) {
+        let voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google')) ||
+          voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Microsoft')) ||
+          voices.find(voice => voice.lang === 'en-US');
+        if (preferredVoice) utterance.voice = preferredVoice;
+      }
+
+      utterance.onerror = (event) => {
+        console.warn("语音错误", event);
+      };
+      window.speechSynthesis.speak(utterance);
+      currentUtterance = utterance;
+    }
+
+    // 为了确保voices异步加载后按钮依然正常，预加载一次语音（无副作用）
+    if (typeof window.speechSynthesis !== 'undefined') {
+      window.speechSynthesis.getVoices();
+      // 有些浏览器需要延迟加载
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = () => { };
+      }
+    }
+
+    // 渲染表格
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      countriesData.forEach(item => {
+        const row = tbody.insertRow();
+
+        // 国家列
+        const countryCell = row.insertCell(0);
+        const countryContainer = createSpeakableCell(item.country);
+        countryCell.appendChild(countryContainer);
+
+        // 国籍(形容词)列
+        const adjCell = row.insertCell(1);
+        const adjContainer = createSpeakableCell(item.nationalityAdj);
+        adjCell.appendChild(adjContainer);
+
+        // 国籍名词列
+        const nounCell = row.insertCell(2);
+        const nounContainer = createSpeakableCell(item.nationalityNoun);
+        nounCell.appendChild(nounContainer);
+
+        // 语言列
+        const langCell = row.insertCell(3);
+        const langContainer = createLanguageCell(item.language);
+        langCell.appendChild(langContainer);
+      });
+    }
+
+    // 页面加载完毕后渲染
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTable();
+      // 额外确保语音合成在用户首次交互时不会因为自动策略而失败，但点击按钮自然触发完全合法
+      // 为了更好的兼容，附加一个小提示: 大多数浏览器要求用户与页面交互后才允许语音, 按钮点击本身即满足。
+    });
+  </script>
+</body>
+
+</html>
