@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>📚 笔试系统班 · 每日打卡</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f0f4f9;
+            padding: 16px 12px 40px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            padding: 20px 16px 32px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #eef2f6;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header h1 small {
+            font-size: 0.8rem;
+            font-weight: 400;
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 2px 12px;
+            border-radius: 40px;
+            margin-left: 4px;
+        }
+
+        .stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #f8fafc;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+
+        .stats span {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .stats .done-num {
+            color: #22c55e;
+        }
+        .stats .total-num {
+            color: #64748b;
+        }
+
+        .reset-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: #475569;
+            cursor: pointer;
+            transition: 0.2s;
+            background: white;
+        }
+
+        .reset-btn:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            background: #fafcff;
+            padding: 10px 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            border: 1px solid #eef2f6;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 6px;
+            background: #e2e8f0;
+        }
+
+        .dot.done {
+            background: #22c55e;
+        }
+        .dot.pending {
+            background: #facc15;
+        }
+        .dot.today {
+            background: #4f46e5;
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+        .dot.rest {
+            background: #e2e8f0;
+            border: 1px dashed #94a3b8;
+        }
+
+        .day-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .day-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: 2px solid transparent;
+            transition: 0.15s;
+        }
+
+        .day-card:hover {
+            background: #f1f5f9;
+            border-color: #d1d9e6;
+        }
+
+        .day-card.today {
+            border-color: #4f46e5;
+            background: #f0f3ff;
+        }
+
+        .day-card.rest-day {
+            background: #f8fafc;
+            border: 2px dashed #d1d9e6;
+            opacity: 0.7;
+        }
+        .day-card.rest-day:hover {
+            background: #f8fafc;
+            border-color: #d1d9e6;
+        }
+
+        .day-card .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .day-card .day-date {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0f172a;
+        }
+
+        .day-card .day-date .weekday {
+            font-weight: 400;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-left: 6px;
+        }
+
+        .day-card .day-progress {
+            font-size: 0.75rem;
+            color: #64748b;
+            background: #e9edf3;
+            padding: 2px 12px;
+            border-radius: 30px;
+        }
+
+        .day-card .day-progress .p-done {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .session-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+            margin-top: 4px;
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 4px 10px 4px 8px;
+            border-radius: 30px;
+            border: 1px solid #e9edf3;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1e293b;
+            transition: 0.1s;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .session-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .session-item:active {
+            transform: scale(0.96);
+        }
+
+        .session-item .check-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            transition: 0.15s;
+        }
+
+        .session-item .check-box.done {
+            background: #22c55e;
+        }
+
+        .session-item .check-box.pending {
+            background: #facc15;
+        }
+
+        .session-item .session-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .no-session {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            padding: 4px 0;
+        }
+
+        .rest-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            padding: 6px 0 2px 0;
+            font-weight: 500;
+        }
+
+        .footer-actions {
+            margin-top: 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid #eef2f6;
+            padding-top: 18px;
+        }
+
+        .btn {
+            background: white;
+            border: 1px solid #d1d9e6;
+            padding: 7px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s;
+            color: #1e293b;
+        }
+
+        .btn-primary {
+            background: #1e293b;
+            border-color: #1e293b;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0f172a;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: opacity 0.25s;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 12px 10px 20px;
+            }
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            .stats {
+                font-size: 0.75rem;
+                padding: 4px 12px;
+                gap: 10px;
+            }
+            .reset-btn {
+                font-size: 0.65rem;
+                padding: 4px 10px;
+            }
+            .day-card {
+                padding: 10px 12px;
+            }
+            .session-item {
+                font-size: 0.65rem;
+                padding: 3px 8px 3px 6px;
+            }
+            .session-item .check-box {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+            }
+            .session-item .session-name {
+                max-width: 120px;
+            }
+            .day-card .day-date {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .session-item .session-name {
+                max-width: 80px;
+            }
+            .session-list {
+                gap: 4px 6px;
+            }
+            .session-item {
+                font-size: 0.6rem;
+                padding: 2px 6px 2px 4px;
+            }
+            .session-item .check-box {
+                width: 16px;
+                height: 16px;
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                📖 笔试系统班
+                <small>7.19 – 9.21</small>
+            </h1>
+            <div class="stats">
+                ✅ <span class="done-num" id="doneCount">0</span>
+                <span style="color:#94a3b8;">/</span>
+                <span class="total-num" id="totalCount">0</span>
+                <span style="color:#94a3b8;font-weight:400;">已打卡</span>
+            </div>
+            <button class="reset-btn" id="resetAllBtn">⟳ 重置</button>
+        </div>
+
+        <div class="legend">
+            <span class="legend-item"><span class="dot done"></span> 已完成</span>
+            <span class="legend-item"><span class="dot pending"></span> 待打卡</span>
+            <span class="legend-item"><span class="dot today"></span> 今天</span>
+            <span class="legend-item"><span class="dot rest"></span> 休息</span>
+            <span class="legend-item">👆 点击任务打卡</span>
+        </div>
+
+        <div id="dayList" class="day-list"></div>
+
+        <div class="footer-actions">
+            <button class="btn btn-outline" id="exportBtn">📋 导出记录</button>
+            <button class="btn btn-primary" id="importBtn">📥 导入记录</button>
+            <input type="file" id="fileInput" accept=".json" style="display:none">
+        </div>
+    </div>
+
+    <div id="toastMessage" class="toast"></div>
+
+    <script>
+        (function() {
+            // ============================================================
+            //  1. 课程数据（直接使用您提供的数据）
+            // ============================================================
+            const ORIGIN_COURSE_DATA = [
+                { baseDate: '2026-07-19', week: '周日', list: ['班会（课程介绍）'] },
+                { baseDate: '2026-07-20', week: '周一', list: ['政治理论1'] },
+                { baseDate: '2026-07-21', week: '周二', list: ['政治理论2', '资料分析1'] },
+                { baseDate: '2026-07-22', week: '周三', list: ['政治理论3', '资料分析2'] },
+                { baseDate: '2026-07-23', week: '周四', list: ['政治理论4', '申论1'] },
+                { baseDate: '2026-07-24', week: '周五', list: ['政治理论5', '资料分析3', '申论2'] },
+                { baseDate: '2026-07-25', week: '周六', list: ['政治理论6', '资料分析4'] },
+                { baseDate: '2026-07-26', week: '周日', list: [] },
+                { baseDate: '2026-07-27', week: '周一', list: ['政治理论7', '资料分析5'] },
+                { baseDate: '2026-07-28', week: '周二', list: ['政治理论8', '资料分析6'] },
+                { baseDate: '2026-07-29', week: '周三', list: ['政治理论9', '资料分析7'] },
+                { baseDate: '2026-07-30', week: '周四', list: ['政治理论10', '申论3'] },
+                { baseDate: '2026-07-31', week: '周五', list: ['政治理论11', '资料总结', '申论4'] },
+                { baseDate: '2026-08-01', week: '周六', list: ['政治理论12', '政治理论13', '言语-片段阅读1'] },
+                { baseDate: '2026-08-02', week: '周日', list: [] },
+                { baseDate: '2026-08-03', week: '周一', list: ['政治理论13', '政治理论14', '言语-片段阅读2'] },
+                { baseDate: '2026-08-04', week: '周二', list: ['政治理论14', '政治理论15', '言语-片段阅读3'] },
+                { baseDate: '2026-08-05', week: '周三', list: ['政治理论15', '政治理论16', '言语-片段阅读4'] },
+                { baseDate: '2026-08-06', week: '周四', list: ['政治理论16', '申论5', '申论6'] },
+                { baseDate: '2026-08-07', week: '周五', list: ['政治理论17', '言语-片段阅读5', '申论6'] },
+                { baseDate: '2026-08-08', week: '周六', list: ['政治理论18', '政治理论19', '言语-片段阅读6'] },
+                { baseDate: '2026-08-09', week: '周日', list: [] },
+                { baseDate: '2026-08-10', week: '周一', list: ['政治理论19', '政治理论20', '言语-逻辑填空1'] },
+                { baseDate: '2026-08-11', week: '周二', list: ['政治理论20', '政治理论21', '言语-逻辑填空2'] },
+                { baseDate: '2026-08-12', week: '周三', list: ['政治理论21', '政治理论22', '言语总结'] },
+                { baseDate: '2026-08-13', week: '周四', list: ['政治理论22', '申论7', '申论7'] },
+                { baseDate: '2026-08-14', week: '周五', list: ['政治理论23', '判断-定义', '申论8'] },
+                { baseDate: '2026-08-15', week: '周六', list: ['政治理论24', '言语1000词1', '判断-逻辑1'] },
+                { baseDate: '2026-08-16', week: '周日', list: [] },
+                { baseDate: '2026-08-17', week: '周一', list: ['言语1000词2', '言语1000词2', '判断-逻辑2'] },
+                { baseDate: '2026-08-18', week: '周二', list: ['言语1000词3', '言语1000词3', '判断-逻辑3'] },
+                { baseDate: '2026-08-19', week: '周三', list: ['言语1000词4', '言语1000词4', '判断-逻辑4'] },
+                { baseDate: '2026-08-20', week: '周四', list: ['言语1000词4', '申论9', '申论9'] },
+                { baseDate: '2026-08-21', week: '周五', list: ['言语1000词5', '判断-类比', '申论10'] },
+                { baseDate: '2026-08-22', week: '周六', list: ['政治理论6', '资料分析4'] },
+                { baseDate: '2026-08-23', week: '周日', list: [] },
+                { baseDate: '2026-08-24', week: '周一', list: ['言语1000词6', '判断-逻辑5'] },
+                { baseDate: '2026-08-25', week: '周二', list: ['言语1000词7', '判断-逻辑6'] },
+                { baseDate: '2026-08-26', week: '周三', list: ['言语1000词8', '数量1'] },
+                { baseDate: '2026-08-27', week: '周四', list: ['言语1000词9', '数量2'] },
+                { baseDate: '2026-08-28', week: '周五', list: ['言语1000词10', '数量3'] },
+                { baseDate: '2026-08-29', week: '周六', list: ['言语1000词11', '数量4', '申论总结'] },
+                { baseDate: '2026-08-30', week: '周日', list: ['数推理论'] },
+                { baseDate: '2026-08-31', week: '周一', list: ['言语1000词12', '数量5'] },
+                { baseDate: '2026-09-01', week: '周二', list: ['言语1000词13', '数量6'] },
+                { baseDate: '2026-09-02', week: '周三', list: ['言语1000词14', '数量7'] },
+                { baseDate: '2026-09-03', week: '周四', list: ['言语1000词15', '数量8'] },
+                { baseDate: '2026-09-04', week: '周五', list: ['言语1000词16', '判断-图推1'] },
+                { baseDate: '2026-09-05', week: '周六', list: ['言语1000词17', '数量9', '判断-图推2'] },
+                { baseDate: '2026-09-06', week: '周日', list: ['数推刷题1'] },
+                { baseDate: '2026-09-07', week: '周一', list: ['言语1000词18', '判断-图推3'] },
+                { baseDate: '2026-09-08', week: '周二', list: ['言语1000词19', '判断-图推4'] },
+                { baseDate: '2026-09-09', week: '周三', list: ['言语1000词20', '判断总结'] },
+                { baseDate: '2026-09-10', week: '周四', list: ['图推早课1-龙飞', '行测方法考点精讲1'] },
+                { baseDate: '2026-09-11', week: '周五', list: ['图推早课2-龙飞', '行测方法考点精讲3'] },
+                { baseDate: '2026-09-12', week: '周六', list: ['图推早课3-龙飞', '行测方法考点精讲5'] },
+                { baseDate: '2026-09-13', week: '周日', list: ['数推刷题2'] },
+                { baseDate: '2026-09-14', week: '周一', list: ['图推早课4-龙飞', '行测方法考点精讲7', '行测方法考点精讲8'] },
+                { baseDate: '2026-09-15', week: '周二', list: ['图推早课5-龙飞', '行测方法考点精讲9', '行测方法考点精讲10'] },
+                { baseDate: '2026-09-16', week: '周三', list: ['图推早课6-龙飞', '行测方法考点精讲11', '行测方法考点精讲12'] },
+                { baseDate: '2026-09-17', week: '周四', list: ['图推早课7-龙飞', '行测方法考点精讲13', '行测方法考点精讲14'] },
+                { baseDate: '2026-09-18', week: '周五', list: ['图推早课8-龙飞', '行测方法考点精讲15', '行测方法考点精讲16'] },
+                { baseDate: '2026-09-19', week: '周六', list: ['图推早课9-龙飞', '行测方法考点精讲17', '行测方法考点精讲18'] },
+                { baseDate: '2026-09-20', week: '周日', list: [] },
+                { baseDate: '2026-09-21', week: '周一', list: ['图推早课10-龙飞', '行测方法考点精讲19', '行测方法考点精讲20'] }
+            ];
+
+            // ============================================================
+            //  2. 工具函数
+            // ============================================================
+            function formatDate(dateStr) {
+                const d = new Date(dateStr);
+                return `${d.getMonth() + 1}月${d.getDate()}日`;
+            }
+
+            function getWeekday(dateStr) {
+                const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+                return weekdays[new Date(dateStr).getDay()];
+            }
+
+            // ============================================================
+            //  3. 存储
+            // ============================================================
+            const STORAGE_KEY = 'study_plan_checklist_v8';
+            let checkData = {};
+
+            function loadData() {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    try { checkData = JSON.parse(stored); } catch (e) { checkData = {}; }
+                } else {
+                    checkData = {};
+                }
+            }
+
+            function saveData() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(checkData));
+            }
+
+            // ============================================================
+            //  4. 渲染
+            // ============================================================
+            const dayListEl = document.getElementById('dayList');
+            const doneCountEl = document.getElementById('doneCount');
+            const totalCountEl = document.getElementById('totalCount');
+            const toastEl = document.getElementById('toastMessage');
+
+            let toastTimer = null;
+
+            function showToast(msg) {
+                toastEl.textContent = msg;
+                toastEl.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, 2000);
+            }
+
+            // 构建日期映射
+            const dateMap = {};
+            ORIGIN_COURSE_DATA.forEach(item => {
+                dateMap[item.baseDate] = item.list;
+            });
+
+            // 获取所有日期
+            const allDates = ORIGIN_COURSE_DATA.map(item => item.baseDate);
+
+            let isProcessing = false;
+
+            function render() {
+                const today = new Date().toISOString().slice(0, 10);
+                let html = '';
+                let total = 0;
+                let done = 0;
+
+                allDates.forEach(dateStr => {
+                    const sessions = dateMap[dateStr] || [];
+                    const isToday = dateStr === today;
+                    const weekday = getWeekday(dateStr);
+                    const displayDate = formatDate(dateStr);
+                    const isSunday = weekday === '周日';
+                    const hasData = sessions.length > 0;
+
+                    // 周日 且 无课程 → 休息日
+                    const isRestDay = isSunday && !hasData;
+
+                    let dayDone = 0;
+                    sessions.forEach((_, idx) => {
+                        const key = `${dateStr}|${idx}`;
+                        if (checkData[key] === true) dayDone++;
+                    });
+                    const dayTotal = sessions.length;
+                    total += dayTotal;
+                    done += dayDone;
+
+                    let cardClass = 'day-card';
+                    if (isToday) cardClass += ' today';
+                    if (isRestDay) cardClass += ' rest-day';
+
+                    html += `<div class="${cardClass}" data-date="${dateStr}">`;
+                    html += `<div class="day-header">`;
+                    html += `<div class="day-date">${displayDate} <span class="weekday">${weekday}</span></div>`;
+                    if (!isRestDay && dayTotal > 0) {
+                        html += `<div class="day-progress"><span class="p-done">${dayDone}</span> / ${dayTotal}</div>`;
+                    }
+                    html += `</div>`;
+
+                    if (isRestDay) {
+                        html += `<div class="rest-label">📭 无课程安排</div>`;
+                    } else if (hasData) {
+                        html += `<div class="session-list">`;
+                        sessions.forEach((session, idx) => {
+                            const key = `${dateStr}|${idx}`;
+                            const doneFlag = checkData[key] === true;
+                            const checkClass = doneFlag ? 'done' : 'pending';
+                            const checkSymbol = doneFlag ? '✓' : '○';
+
+                            html += `<div class="session-item" data-key="${key}">`;
+                            html += `<span class="check-box ${checkClass}">${checkSymbol}</span>`;
+                            html += `<span class="session-name">${session}</span>`;
+                            html += `</div>`;
+                        });
+                        html += `</div>`;
+                    } else {
+                        html += `<div class="no-session">📭 无课程安排</div>`;
+                    }
+
+                    html += `</div>`;
+                });
+
+                dayListEl.innerHTML = html;
+
+                doneCountEl.textContent = done;
+                totalCountEl.textContent = total;
+            }
+
+            // ============================================================
+            //  5. 事件绑定
+            // ============================================================
+            function bindEvents() {
+                const list = document.getElementById('dayList');
+
+                list.addEventListener('click', function(e) {
+                    if (isProcessing) return;
+
+                    const item = e.target.closest('.session-item');
+                    if (!item) return;
+
+                    const key = item.dataset.key;
+                    if (!key) return;
+
+                    isProcessing = true;
+
+                    try {
+                        const current = checkData[key] === true;
+                        checkData[key] = !current;
+                        saveData();
+
+                        const checkBox = item.querySelector('.check-box');
+                        const isNowDone = checkData[key] === true;
+                        if (checkBox) {
+                            checkBox.className = `check-box ${isNowDone ? 'done' : 'pending'}`;
+                            checkBox.textContent = isNowDone ? '✓' : '○';
+                        }
+
+                        // 更新统计
+                        let total = 0;
+                        let done = 0;
+                        allDates.forEach(dateStr => {
+                            const sessions = dateMap[dateStr] || [];
+                            sessions.forEach((_, idx) => {
+                                total++;
+                                if (checkData[`${dateStr}|${idx}`] === true) done++;
+                            });
+                        });
+                        doneCountEl.textContent = done;
+                        totalCountEl.textContent = total;
+
+                        // 更新当天进度
+                        const card = item.closest('.day-card');
+                        if (card) {
+                            const date = card.dataset.date;
+                            const sessions = dateMap[date] || [];
+                            let dayDone = 0;
+                            sessions.forEach((_, idx) => {
+                                if (checkData[`${date}|${idx}`] === true) dayDone++;
+                            });
+                            const progressEl = card.querySelector('.day-progress');
+                            if (progressEl) {
+                                progressEl.innerHTML = `<span class="p-done">${dayDone}</span> / ${sessions.length}`;
+                            }
+                        }
+
+                        showToast(isNowDone ? '✅ 打卡成功！' : '❌ 取消打卡');
+                    } catch (err) {
+                        console.error(err);
+                    } finally {
+                        isProcessing = false;
+                    }
+                });
+            }
+
+            // ============================================================
+            //  6. 重置 / 导出 / 导入
+            // ============================================================
+            function resetAll() {
+                if (confirm('确定要重置所有打卡记录吗？')) {
+                    checkData = {};
+                    saveData();
+                    render();
+                    showToast('🔄 已重置所有打卡');
+                }
+            }
+
+            function exportData() {
+                const data = {
+                    version: 'v8',
+                    exportTime: new Date().toISOString(),
+                    startDate: allDates[0],
+                    endDate: allDates[allDates.length - 1],
+                    checkData: checkData,
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `打卡记录_${allDates[0]}_至_${allDates[allDates.length - 1]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('📋 导出成功');
+            }
+
+            function importData(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.checkData && typeof data.checkData === 'object') {
+                            checkData = data.checkData;
+                            saveData();
+                            render();
+                            showToast('📥 导入成功！');
+                        } else {
+                            showToast('❌ 无效的打卡数据文件');
+                        }
+                    } catch (err) {
+                        showToast('❌ 文件解析失败');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // ============================================================
+            //  7. 初始化
+            // ============================================================
+            loadData();
+            render();
+            bindEvents();
+
+            document.getElementById('resetAllBtn').addEventListener('click', resetAll);
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', function() {
+                document.getElementById('fileInput').click();
+            });
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    importData(this.files[0]);
+                    this.value = '';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
